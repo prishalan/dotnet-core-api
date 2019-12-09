@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ApiTest2.Data;
 using ApiTest2.Entities;
+using ApiTest2.Interfaces;
 using ApiTest2.Models.Configuration;
+using ApiTest2.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -58,6 +60,10 @@ namespace ApiTest2
                 options.Password.RequireUppercase = false;
             })
             .AddEntityFrameworkStores<AppDbContext>();
+
+
+            services.AddScoped<IUserService, UserService>();
+
 
             var jwtSettings = new JwtSettings();
             Configuration.Bind(nameof(JwtSettings), jwtSettings);

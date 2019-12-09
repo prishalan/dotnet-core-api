@@ -21,6 +21,8 @@ namespace ApiTest2.Controllers
         }
 
 
+        [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequestModel model)
         {
 
