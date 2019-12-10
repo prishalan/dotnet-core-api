@@ -26,10 +26,14 @@ namespace ApiTest2.Services
             _jwtSettings = jwtSettings;
         }
 
+
+
         public async Task<AuthenticatonResult> AuthenticateAsync(UserLoginRequestModel model)
         {
             throw new NotImplementedException();
         }
+
+
 
         public async Task<AuthenticatonResult> RegisterAsync(string username, string password, string firstname, string lastname, string company = null)
         {
@@ -66,6 +70,8 @@ namespace ApiTest2.Services
                 Message = $"An email has been sent to: {username}. Please verify your account"
             };
         }
+
+
 
         private string GenerateToken(AppUser user)
         {

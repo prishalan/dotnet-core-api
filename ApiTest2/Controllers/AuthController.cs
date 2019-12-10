@@ -35,6 +35,17 @@ namespace ApiTest2.Controllers
         }
 
 
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequestModel model)
+        {
+
+
+            return Ok();
+        }
+
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
