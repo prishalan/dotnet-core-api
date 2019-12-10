@@ -7,5 +7,6 @@ namespace ApiTest2.Models.Transfer
 {
     public class UserLoginResponseModel
     {
+        public string Token { get; set; }
     }
 }
