@@ -9,8 +9,8 @@ namespace ApiTest2.Interfaces
 {
     public interface IUserService
     {
-        AppUser Authenticate(UserLoginRequestModel model);
+        Task<AuthenticatonResult> AuthenticateAsync(UserLoginRequestModel model);
 
-        AppUser Create(UserRegisterRequestModel model);
+        Task<AuthenticatonResult> RegisterAsync(string username, string password, string firstname, string lastname, string company = null);
     }
 }

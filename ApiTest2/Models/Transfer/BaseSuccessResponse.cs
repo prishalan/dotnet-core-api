@@ -8,6 +8,7 @@ namespace ApiTest2.Models.Transfer
 {
     public class BaseSuccessResponse<T>
     {
+        public bool Success { get; } = true;
         public ResponseSuccessStatusCode Status { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }

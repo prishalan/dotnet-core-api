@@ -8,6 +8,7 @@ namespace ApiTest2.Models.Transfer
 {
     public class BaseFailureResponse<T>
     {
+        public bool Success { get; } = false;
         public ResponseFailureStatusCode Status { get; set; }
         public string Message { get; set; }
         public IAsyncEnumerable<string> Errors { get; set; }
