@@ -63,6 +63,7 @@ namespace ApiTest2
 
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IGlossaryService, GlossaryService>();
 
 
             var jwtSettings = new JwtSettings();

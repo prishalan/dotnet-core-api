@@ -39,9 +39,16 @@ namespace ApiTest2.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.Values.SelectMany(s => s.Errors.Select(x => x.ErrorMessage)));
 
 
-            return Ok();
+            var userToAuthenticate = await _userService.AuthenticateAsync(model.Username, model.Password);
+
+            if (!userToAuthenticate.Success)
+                return BadRequest(userToAuthenticate.Message);
+
+            return Ok(userToAuthenticate.Token);
         }
 
 

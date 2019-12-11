@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiTest2.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,19 @@ namespace ApiTest2.Controllers
     [ApiController]
     public class GlossaryController : ControllerBase
     {
+        private readonly IGlossaryService _glossaryService;
+
+        public GlossaryController(IGlossaryService glossaryService)
+        {
+            _glossaryService = glossaryService;
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(new { message = "hello prish" });
+            var glossary = await _glossaryService.GetGlossaryTerms();
+            return Ok(glossary);
         }
 
         [HttpGet("test")]

@@ -4,9 +4,13 @@ using ApiTest2.Models.Configuration;
 using ApiTest2.Models.Transfer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApiTest2.Services
@@ -28,9 +32,38 @@ namespace ApiTest2.Services
 
 
 
-        public async Task<AuthenticatonResult> AuthenticateAsync(UserLoginRequestModel model)
+        public async Task<AuthenticatonResult> AuthenticateAsync(string username, string password)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(username);
+
+            if (user == null)
+                return new AuthenticatonResult
+                {
+                    Success = false,
+                    Message = "User does not exist. [[ REMOVE FOR PRODUCTION ]]"
+                };
+
+            var userHasValidPassword = await _userManager.CheckPasswordAsync(user, password);
+
+            if (!userHasValidPassword)
+                return new AuthenticatonResult
+                {
+                    Success = false,
+                    Message = "User password failed. [[ REMOVE FOR PRODUCTION ]]"
+                };
+
+            if (!user.EmailConfirmed)
+                return new AuthenticatonResult
+                {
+                    Success = false,
+                    Message = "Your email has not yet been confirmed. [[ REMOVE FOR PRODUCTION ]]"
+                };
+
+            return new AuthenticatonResult
+            {
+                Success = true,
+                Token = GenerateAuthenticationToken(user)
+            };
         }
 
 
@@ -73,9 +106,36 @@ namespace ApiTest2.Services
 
 
 
-        private string GenerateToken(AppUser user)
+        private string GenerateAuthenticationToken(AppUser user)
         {
-            return "";
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.GivenName, user.Firstname),
+                    new Claim(JwtRegisteredClaimNames.FamilyName, user.Lastname),
+                    new Claim("id", user.Id),
+                }),
+                    Expires = DateTime.UtcNow.AddMinutes((double)_jwtSettings.ExpiryInMinutes),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                return tokenHandler.WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
