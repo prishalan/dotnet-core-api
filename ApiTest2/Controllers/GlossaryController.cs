@@ -6,6 +6,7 @@ using ApiTest2.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ApiTest2.Extensions;
 
 namespace ApiTest2.Controllers
 {
@@ -22,9 +23,11 @@ namespace ApiTest2.Controllers
 
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
-            var glossary = await _glossaryService.GetGlossaryTerms();
+            var userId = HttpContext.GetUserId();
+            var glossary = await _glossaryService.GetGlossaryTerms(userId);
             return Ok(glossary);
         }
 

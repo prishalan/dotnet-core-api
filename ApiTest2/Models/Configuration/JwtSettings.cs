@@ -9,5 +9,7 @@ namespace ApiTest2.Models.Configuration
     {
         public string Secret { get; set; }
         public int ExpiryInMinutes { get; set; }
+
+        public string TokenLifetime { get; set; }
     }
 }

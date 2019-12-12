@@ -22,7 +22,7 @@ namespace ApiTest2.Services
         {
             try
             {
-                return await _context.Glossary.ToListAsync();
+                return await _context.Glossary.Where(x => x.UserId == userId).ToListAsync();
             }
             catch (Exception ex)
             {

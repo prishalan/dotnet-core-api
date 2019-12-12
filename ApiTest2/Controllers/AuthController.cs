@@ -39,6 +39,8 @@ namespace ApiTest2.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestModel model)
         {
+            //var vpd = new ValidationProblemDetails { };
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.Values.SelectMany(s => s.Errors.Select(x => x.ErrorMessage)));
 
@@ -52,11 +54,13 @@ namespace ApiTest2.Controllers
         }
 
 
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh()
         {
-            return Ok($"value: {id}");
+
+
+            return Ok();
         }
-}
+    }
 }
