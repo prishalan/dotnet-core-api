@@ -12,5 +12,7 @@ namespace ApiTest2.Interfaces
         Task<AuthenticatonResult> AuthenticateAsync(string username, string password);
 
         Task<AuthenticatonResult> RegisterAsync(string username, string password, string firstname, string lastname, string company = null);
+
+        Task<AuthenticatonResult> RefreshTokenAsync(string token, string refresh);
     }
 }

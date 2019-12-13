@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ApiTest2.Models.Transfer
 {
-    public class UserLoginResponseModel
+    public class RefreshTokenRequestModel
     {
         public string Token { get; set; }
         public string RefreshToken { get; set; }

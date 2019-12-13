@@ -44,23 +44,37 @@ namespace ApiTest2.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.Values.SelectMany(s => s.Errors.Select(x => x.ErrorMessage)));
 
-
             var userToAuthenticate = await _userService.AuthenticateAsync(model.Username, model.Password);
 
             if (!userToAuthenticate.Success)
                 return BadRequest(userToAuthenticate.Message);
 
-            return Ok(userToAuthenticate.Token);
+            var successfulAuthResult = new Models.Transfer.UserLoginResponseModel
+            {
+                Token = userToAuthenticate.Token,
+                RefreshToken = userToAuthenticate.RefreshToken
+            };
+
+            return Ok(successfulAuthResult);
         }
 
 
         [HttpGet]
         [Route("refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestModel model)
         {
+            var authResponse = await _userService.RefreshTokenAsync(model.Token, model.RefreshToken);
 
+            if (!authResponse.Success)
+                return BadRequest(authResponse.Message);
 
-            return Ok();
+            var successfulAuthResult = new Models.Transfer.UserLoginResponseModel
+            {
+                Token = authResponse.Token,
+                RefreshToken = authResponse.RefreshToken
+            };
+
+            return Ok(successfulAuthResult);
         }
     }
 }

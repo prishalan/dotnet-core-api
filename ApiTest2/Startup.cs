@@ -39,6 +39,11 @@ namespace ApiTest2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true; // --> disables default ModelState ValidationProblemDetails error
+            });
+
             services.AddCors();
 
             services.AddControllers();
@@ -66,13 +71,28 @@ namespace ApiTest2
             services.AddScoped<IGlossaryService, GlossaryService>();
 
 
+
+
+
+
             var jwtSettings = new JwtSettings();
             Configuration.Bind(nameof(JwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
 
             var key = Encoding.UTF8.GetBytes(jwtSettings.Secret);
 
-            services.AddAuthentication(options => {
+            var tokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false, // --> change
+                ValidateAudience = false, // --> change
+                RequireExpirationTime = false,
+                ValidateLifetime = true
+            };
+
+            services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -88,18 +108,10 @@ namespace ApiTest2
                 //};
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false, // --> change
-                    ValidateAudience = false, // --> change
-                    RequireExpirationTime = false,
-                    ValidateLifetime = true
-                };
+                options.TokenValidationParameters = tokenValidationParameters;
             });
 
-            
+            services.AddSingleton(tokenValidationParameters);
         }
 
 

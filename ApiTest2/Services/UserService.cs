@@ -21,13 +21,21 @@ namespace ApiTest2.Services
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly JwtSettings _jwtSettings;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration, JwtSettings jwtSettings)
+        public UserService(
+            UserManager<AppUser> userManager, 
+            SignInManager<AppUser> signInManager, 
+            IConfiguration configuration, 
+            JwtSettings jwtSettings,
+            TokenValidationParameters tokenValidationParameters
+        )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _jwtSettings = jwtSettings;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
 
@@ -105,6 +113,16 @@ namespace ApiTest2.Services
         }
 
 
+        public async Task<AuthenticatonResult> RefreshTokenAsync(string token, string refresh)
+        {
+
+            return new AuthenticatonResult
+            {
+
+            };
+        }
+
+
 
         private string GenerateAuthenticationToken(AppUser user)
         {
@@ -124,7 +142,7 @@ namespace ApiTest2.Services
                     new Claim(JwtRegisteredClaimNames.FamilyName, user.Lastname),
                     new Claim("id", user.Id),
                 }),
-                    Expires = DateTime.UtcNow.AddMinutes((double)_jwtSettings.ExpiryInMinutes),
+                    Expires = DateTime.UtcNow.Add(_jwtSettings.TokenLifetime),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
@@ -136,6 +154,32 @@ namespace ApiTest2.Services
             {
                 throw ex;
             }
+        }
+
+
+        private ClaimsPrincipal GetPrincipalFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
+                if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
+                {
+                    return null;
+                }
+
+                return principal;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
+        {
+            return ((validatedToken is JwtSecurityToken jwtSecurityToken) && (jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)));
         }
     }
 }
