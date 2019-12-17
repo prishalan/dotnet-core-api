@@ -101,6 +101,7 @@ namespace ApiTest2
                 //{
                 //    OnTokenValidated = context =>
                 //    {
+                //        // --> use this method to run checks like if the user is active or not, etc.
                 //        context.Fail("Unathorised");
 
                 //        return Task.CompletedTask;
